@@ -1,3 +1,4 @@
+
 {
   "version": 2,
   "builds": [
@@ -23,7 +24,40 @@
   "functions": {
     "api/**/*.js": {
       "runtime": "nodejs18.x",
-      "maxDuration": 30
+      "maxDuration": 30,
+      "memory": 1024
     }
-  }
+  },
+  "env": {
+    "NODE_ENV": "production",
+    "N8N_HOST": "0.0.0.0",
+    "N8N_PORT": "5678",
+    "N8N_PROTOCOL": "https",
+    "WEBHOOK_URL": "https://your-app.vercel.app",
+    "N8N_ENCRYPTION_KEY": "@n8n_encryption_key",
+    "N8N_USER_MANAGEMENT_DISABLED": "true",
+    "N8N_DIAGNOSTICS_ENABLED": "false",
+    "N8N_VERSION_NOTIFICATIONS_ENABLED": "false",
+    "N8N_TEMPLATES_ENABLED": "false",
+    "N8N_PERSONALIZATION_ENABLED": "false"
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
 }

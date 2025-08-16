@@ -1,3 +1,4 @@
+
 {
   "version": 2,
   "builds": [
@@ -22,7 +23,6 @@
   ],
   "functions": {
     "api/**/*.js": {
-      "runtime": "nodejs18.x",
       "maxDuration": 30
     }
   }

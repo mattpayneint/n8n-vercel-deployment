@@ -1,13 +1,5 @@
 {
   "functions": {
-    "api/execute.js": {
-      "runtime": "nodejs18.x"
-    },
-    "api/webhook.js": {
-      "runtime": "nodejs18.x"
-    },
-    "api/status.js": {
-      "runtime": "nodejs18.x"
-    }
+    "api/*.js": {}
   }
 }

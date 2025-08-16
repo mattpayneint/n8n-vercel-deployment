@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N8N Workflow Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 90%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .workflow-builder {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .input-group input, .input-group textarea, .input-group select {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .workflow-preview {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .workflow-preview h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .workflow-preview pre {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 14px;
+            border: 1px solid #e1e5e9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 N8N Workflow Builder</h1>
+            <p>Create and execute automated workflows with ease</p>
+        </div>
+        
+        <div class="workflow-builder">
+            <div class="input-group">
+                <label for="workflowName">Workflow Name</label>
+                <input type="text" id="workflowName" placeholder="Enter workflow name" value="My Workflow">
+            </div>
+            
+            <div class="input-group">
+                <label for="triggerType">Trigger Type</label>
+                <select id="triggerType">
+                    <option value="webhook">Webhook</option>
+                    <option value="schedule">Schedule</option>
+                    <option value="manual">Manual</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="actionType">Action Type</label>
+                <select id="actionType">
+                    <option value="http">HTTP Request</option>
+                    <option value="email">Send Email</option>
+                    <option value="slack">Slack Message</option>
+                    <option value="webhook">Webhook</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="actionUrl">Action URL</label>
+                <input type="url" id="actionUrl" placeholder="https://api.example.com/endpoint">
+            </div>
+            
+            <div class="input-group">
+                <label for="actionData">Action Data (JSON)</label>
+                <textarea id="actionData" rows="4" placeholder='{"message": "Hello World"}'></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="generateWorkflow()">Generate Workflow</button>
+                <button class="btn btn-primary" onclick="executeWorkflow()">Execute Workflow</button>
+                <button class="btn btn-secondary" onclick="checkStatus()">Check Status</button>
+            </div>
+            
+            <div id="status" class="status"></div>
+            
+            <div id="workflowPreview" class="workflow-preview" style="display: none;">
+                <h3>Generated Workflow</h3>
+                <pre id="workflowJson"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentWorkflow = null;
+
+        function showStatus(message, type = 'loading') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+        }
+
+        function hideStatus() {
+            document.getElementById('status').style.display = 'none';
+        }
+
+        function generateWorkflow() {
+            const workflowName = document.getElementById('workflowName').value;
+            const triggerType = document.getElementById('triggerType').value;
+            const actionType = document.getElementById('actionType').value;
+            const actionUrl = document.getElementById('actionUrl').value;
+            const actionData = document.getElementById('actionData').value;
+
+            let parsedActionData = {};
+            try {
+                if (actionData.trim()) {
+                    parsedActionData = JSON.parse(actionData);
+                }
+            } catch (e) {
+                showStatus('Invalid JSON in Action Data', 'error');
+                return;
+            }
+
+            currentWorkflow = {
+                name: workflowName,
+                nodes: [
+                    {
+                        id: 'trigger',
+                        type: triggerType,
+                        name: `${triggerType} Trigger`,
+                        parameters: triggerType === 'schedule' ? { rule: { interval: [{ field: 'cronExpression', value: '0 9 * * *' }] } } : {}
+                    },
+                    {
+                        id: 'action',
+                        type: actionType,
+                        name: `${actionType} Action`,
+                        parameters: {
+                            url: actionUrl,
+                            method: 'POST',
+                            body: parsedActionData,
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    }
+                ],
+                connections: {
+                    trigger: {
+                        main: [
+                            [
+                                {
+                                    node: 'action',
+                                    type: 'main',
+                                    index: 0
+                                }
+                            ]
+                        ]
+                    }
+                }
+            };
+
+            document.getElementById('workflowJson').textContent = JSON.stringify(currentWorkflow, null, 2);
+            document.getElementById('workflowPreview').style.display = 'block';
+            showStatus('Workflow generated successfully!', 'success');
+        }
+
+        async function executeWorkflow() {
+            if (!currentWorkflow) {
+                showStatus('Please generate a workflow first', 'error');
+                return;
+            }
+
+            showStatus('Executing workflow...', 'loading');
+
+            try {
+                const response = await fetch('/api/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ workflow: currentWorkflow })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showStatus(`Workflow executed successfully! Execution ID: ${result.executionId}`, 'success');
+                } else {
+                    showStatus(`Execution failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkStatus() {
+            showStatus('Checking system status...', 'loading');
+
+            try {
+                const response = await fetch('/api/status');
+                const result = await response.json();
+
+                if (response.ok) {
+                    const envStatus = result.environment;
+                    const statusMessage = `System Status: ${result.status}\n` +
+                        `N8N Webhook: ${envStatus.n8nWebhookConfigured ? '✅' : '❌'}\n` +
+                        `N8N API: ${envStatus.n8nApiConfigured ? '✅' : '❌'}\n` +
+                        `Auth: ${envStatus.basicAuthConfigured ? '✅' : '❌'}`;
+                    
+                    showStatus(statusMessage, result.status === 'healthy' ? 'success' : 'error');
+                } else {
+                    showStatus(`Status check failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize with a sample workflow
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('actionUrl').value = 'https://httpbin.org/post';
+            document.getElementById('actionData').value = '{"message": "Hello from N8N!", "timestamp": "{{$now}}"}';
+        });
+    </script>
+</body>
+</html>

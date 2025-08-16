@@ -1,0 +1,4 @@
+Vercel CLI 46.0.1
+WARN! `--confirm` is deprecated, please use `--yes` instead
+Loading scopes…
+Error: The specified token is not valid. Use `vercel login` to generate a new token.
